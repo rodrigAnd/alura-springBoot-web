@@ -1,5 +1,6 @@
 package br.com.alura.alura.service
 
+import br.com.alura.alura.exception.NotFoundException
 import br.com.alura.alura.mapper.TopicoFormMapper
 import br.com.alura.alura.mapper.TopicoViewMapper
 import br.com.alura.alura.model.*
@@ -17,7 +18,8 @@ import java.util.stream.Collectors
 class TopicoService(
     private var topicoService: List<Topico> = ArrayList(),
     private var topicoViewMapper: TopicoViewMapper,
-    private var topicoFormMapper: TopicoFormMapper
+    private var topicoFormMapper: TopicoFormMapper,
+    private val messageNotFoundException: String = "Mensagem nao Encontrada!"
 ) {
 
 
@@ -30,7 +32,7 @@ class TopicoService(
     fun buscarPorId(id: Long): TopicoView {
         val topicoView = topicoService.stream().filter { t ->
             t.id == id
-        }.findFirst().get()
+        }.findFirst().orElseThrow { NotFoundException(messageNotFoundException) }
 
         return topicoViewMapper.map(topicoView)
     }
@@ -45,7 +47,7 @@ class TopicoService(
     fun atualizar(form: AtualizacaoTopicoForm): TopicoView {
         val topico = topicoService.stream().filter { t ->
             t.id == form.id
-        }.findFirst().get()
+        }.findFirst().orElseThrow { NotFoundException(messageNotFoundException) }
         val novoTopicoAtualizado = Topico(
             id = form.id,
             titulo = form.titulo,
@@ -63,7 +65,7 @@ class TopicoService(
     fun deletar(id: Long) {
         val topico = topicoService.stream().filter { t ->
             t.id == id
-        }.findFirst().get()
+        }.findFirst().get()//orElseThrow { NotFoundException(messageNotFoundException) }
         topicoService = topicoService.minus(topico)
     }
 }
